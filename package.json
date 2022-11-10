@@ -1,0 +1,19 @@
+{
+  "name": "purchase-tracking-system",
+  "version": "1.0.0",
+  "description": "API for purchase tracking system",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mobak88/purchase-tracking-system.git"
+  },
+  "author": "Mustafa Baker",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mobak88/purchase-tracking-system/issues"
+  },
+  "homepage": "https://github.com/mobak88/purchase-tracking-system#readme"
+}
