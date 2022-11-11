@@ -18,6 +18,5 @@ CREATE TABLE product(
     product_name VARCHAR(255) NOT NULL,
     category VARCHAR(255),
     price SMALLINT NOT NULL,
-    fk_transaction INT REFERENCES transaction (transaction_id) NOT NULL,
-    UNIQUE(fk_transaction)
+    fk_transaction INT REFERENCES transaction (transaction_id) NOT NULL
 );
