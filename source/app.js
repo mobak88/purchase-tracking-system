@@ -37,30 +37,32 @@ app.get('/cards/:id', async (req, res) => {
         const transactions = await pool.query('SELECT * FROM transaction WHERE fk_card = $1', [id]);
         const products = await pool.query('SELECT * FROM product');
 
+        /* Creating an array of objects with transactions */
+        const updatedTransactions = transactions.rows.map(transaction => {
+            /* Finding products with correct foreign key, creating an array of objects with products */
+            const filteredProducts = products.rows.filter(product => {
+                if (product.fk_transaction === transaction.transaction_id) {
+                    return product;
+                }
+            });
+
+            /* Checking if products key exists */
+            if (transaction.products && transaction.products.length > 0) {
+                return { ...transaction, products: [...transaction.products, filteredProducts] };
+            } else {
+                return { ...transaction, products: filteredProducts };
+            }
+        });
 
         /* Destructuring card because there are always only one card */
         const [rows] = card.rows;
 
         const cardWithTransactions = {
             card: rows,
-            transactions: transactions.rows
+            transactions: updatedTransactions
         };
 
-        /* const filteredProducts = products.rows.filter(product => product.fk_transaction === transaction_id) */
-        /* Find products with same fk_transaction as transaction_id */
-        const updatedCard = cardWithTransactions.transactions.map(transaction => {
-            /* Add if condition, if(transaction.Id === inputId) then run below code */
-            if (transaction.products && transaction.products.length > 0) {
-                // Push filtered products
-                return { ...transaction, products: [...transaction.products, products.rows] };
-            } else {
-                return { ...transaction, products: products.rows };
-            }
-        });
-
-        console.log(transactions.rows);
-
-        res.json(updatedCard);
+        res.json(cardWithTransactions);
     } catch (err) {
         console.error(err.message);
     }
