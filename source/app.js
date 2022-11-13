@@ -46,7 +46,7 @@ app.get('/cards/:id', async (req, res) => {
                 }
             });
 
-            /* Checking if products key exists */
+            /* Checking if products key exists, creating product array if it does not exist */
             if (transaction.products && transaction.products.length > 0) {
                 return { ...transaction, products: [...transaction.products, filteredProducts] };
             } else {
@@ -58,11 +58,30 @@ app.get('/cards/:id', async (req, res) => {
         const [rows] = card.rows;
 
         const cardWithTransactions = {
-            card: rows,
+            /* Replace ...rows with cards: rows to separate card and transactions, I prefer to have them in one object */
+            ...rows,
             transactions: updatedTransactions
         };
 
         res.json(cardWithTransactions);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+// Get products registered on a given date
+app.get('/days/:date', async (req, res) => {
+    try {
+        const { date } = req.params;
+
+        /* I managaged to join 3 tables yay :-) */
+        const transactions = await pool.query('SELECT * FROM product JOIN transaction ON transaction_id = fk_transaction JOIN creditcard ON card_id = fk_card WHERE date_string = $1', [date]);
+
+        const result = {
+
+        };
+
+        res.json(transactions.rows);
     } catch (err) {
         console.error(err.message);
     }
