@@ -20,10 +20,9 @@ app.get('/', (req, res) => {
 //Get all cards
 app.get('/cards', async (req, res) => {
     try {
-        const allCards = await pool.query('SELECT * FROM creditcard');
-        const cardandTrans = await pool.query('SELECT * FROM creditcard JOIN transaction ON transaction_id = card_id');
+        const cardsandTrans = await pool.query('SELECT * FROM creditcard JOIN transaction ON transaction_id = card_id');
 
-        res.json(cardandTrans.rows);
+        res.json(cardsandTrans.rows);
     } catch (err) {
         console.error(err.message);
     }
@@ -77,11 +76,54 @@ app.get('/days/:date', async (req, res) => {
         /* I managaged to join 3 tables yay :-) */
         const transactions = await pool.query('SELECT * FROM product JOIN transaction ON transaction_id = fk_transaction JOIN creditcard ON card_id = fk_card WHERE date_string = $1', [date]);
 
-        const result = {
+        /* Return unique cards */
+        const cardNumberSet = new Set();
 
+        const filteredCards = transactions.rows.filter(card => {
+            if (!cardNumberSet.has(card.card_number)) {
+                cardNumberSet.add(card.card_number);
+                return card.card_number;
+            } else {
+                return;
+            }
+        });
+
+        /* Removing everything except card-number and card_id, adding empty transactions array to make it easier to add transactions */
+        const cards = filteredCards.map(card => {
+            return { card_number: card.card_number, card_id: card.card_id, transactions: [] };
+        });
+
+        cards.forEach(card => {
+            transactions.rows.forEach(transaction => {
+                if (transaction.card_number === card.card_number) {
+                    card.transactions.push({
+                        transaction_id: transaction.transaction_id,
+                        fk_card: transaction.fk_card,
+                        transaction_store: transaction.transaction_store,
+                        transaction_place: transaction.transaction_place,
+                        date_string: transaction.date_string,
+                        products: [
+                            {
+                                product_id: transaction.product_id,
+                                product_name: transaction.product_name,
+                                category: transaction.category,
+                                price: transaction.price,
+                                fk_transaction: transaction.fk_transaction
+                            }
+
+                        ]
+                    });
+                }
+            }
+            );
+        });
+
+        const result = {
+            cards
         };
 
-        res.json(transactions.rows);
+        console.log(result);
+        res.json(result);
     } catch (err) {
         console.error(err.message);
     }
