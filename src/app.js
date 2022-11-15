@@ -74,55 +74,105 @@ app.get('/days/:date', async (req, res) => {
         const { date } = req.params;
 
         /* I managaged to join 3 tables yay :-) */
-        const transactions = await pool.query('SELECT * FROM product JOIN transaction ON transaction_id = fk_transaction JOIN creditcard ON card_id = fk_card WHERE date_string = $1', [date]);
+        const allData = await pool.query('SELECT * FROM product JOIN transaction ON transaction_id = fk_transaction JOIN creditcard ON card_id = fk_card WHERE date_string = $1', [date]);
 
         /* Return unique cards */
         const cardNumberSet = new Set();
 
-        const filteredCards = transactions.rows.filter(card => {
+        const filteredCards = allData.rows.filter(card => {
             if (!cardNumberSet.has(card.card_number)) {
                 cardNumberSet.add(card.card_number);
-                return card.card_number;
+                return card;
             } else {
                 return;
             }
         });
 
-        /* Removing everything except card-number and card_id, adding empty transactions array to make it easier to add transactions */
+        /* Removing everything except card data */
         const cards = filteredCards.map(card => {
-            return { card_number: card.card_number, card_id: card.card_id, transactions: [] };
+            return { card_number: card.card_number, card_id: card.card_id };
         });
 
-        cards.forEach(card => {
-            transactions.rows.forEach(transaction => {
-                if (transaction.card_number === card.card_number) {
-                    card.transactions.push({
-                        transaction_id: transaction.transaction_id,
-                        fk_card: transaction.fk_card,
-                        transaction_store: transaction.transaction_store,
-                        transaction_place: transaction.transaction_place,
-                        date_string: transaction.date_string,
-                        products: [
-                            {
-                                product_id: transaction.product_id,
-                                product_name: transaction.product_name,
-                                category: transaction.category,
-                                price: transaction.price,
-                                fk_transaction: transaction.fk_transaction
-                            }
+        /* Return unique transactions */
+        const transactionSet = new Set();
 
-                        ]
-                    });
-                }
+        const filteredTransactions = allData.rows.filter(transaction => {
+            if (!transactionSet.has(transaction.transaction_id)) {
+                transactionSet.add(transaction.transaction_id);
+                return transaction;
+            } else {
+                return;
             }
-            );
+        });
+
+        /* Removing everything except transaction data */
+        const transactions = filteredTransactions.map(transaction => {
+            return {
+                transaction_id: transaction.transaction_id,
+                fk_card: transaction.fk_card,
+                transaction_store: transaction.transaction_store,
+                transaction_place: transaction.transaction_place,
+                date_string: transaction.date_string
+            };
+        });
+
+        /* Return unique product */
+        const productSet = new Set();
+
+        const filteredProducts = allData.rows.filter(product => {
+            if (!productSet.has(product.product_id)) {
+                productSet.add(product.product_id);
+                return product;
+            } else {
+                return;
+            }
+        });
+
+        /* Removing everything except product data */
+        const products = filteredProducts.map(product => {
+            return {
+                product_id: product.product_id,
+                product_name: product.product_name,
+                category: product.category,
+                price: product.price,
+                fk_transaction: product.fk_transaction
+            };
+        });
+
+        const transactionsWithProducts = transactions.map(transaction => {
+            /* Finding products with correct foreign key, creating an array of objects with products */
+            const filteredProducts = products.filter(product => {
+                if (transaction.transaction_id === product.fk_transaction) {
+                    return product;
+                }
+            });
+
+            if (transaction.products && transaction.products.length > 0) {
+                return { ...transaction, products: [...transaction.products, filteredProducts] };
+            } else {
+                return { ...transaction, products: filteredProducts };
+            }
+        });
+
+        const data = cards.map(card => {
+            /* Finding transactions with correct foreign key, creating an array of objects with transactions */
+            const filteredTransactions = transactionsWithProducts.filter(transaction => {
+                if (card.card_id === transaction.fk_card) {
+                    return transaction;
+                }
+            });
+
+            if (card.transactions && card.transactions.length > 0) {
+                return { ...card, transactions: [...card.transactions, filteredTransactions] };
+            } else {
+                return { ...card, transactions: filteredTransactions };
+            }
         });
 
         const result = {
-            cards
+            data
         };
 
-        console.log(result);
         res.json(result);
     } catch (err) {
         console.error(err.message);
