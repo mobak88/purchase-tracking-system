@@ -2,7 +2,7 @@ const filteredItems = require('./filterItems');
 
 /** 
   * Creating data structure function to avoid repeating code
-  * even though a lot of the code are repeating its 
+  * even though a lot of the code are repeating below its 
   * very difficult to create reusable function when working with
   * chained objects
 */

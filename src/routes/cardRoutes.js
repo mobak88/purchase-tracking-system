@@ -9,6 +9,7 @@ router
 
 router
     .route('/cards/:id')
-    .get(cardController.getCard);
+    .get(cardController.getCard)
+    .delete();
 
 module.exports = router;
