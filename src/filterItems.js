@@ -1,4 +1,13 @@
 /* Moving filter functions here to not clutter HTTP requests */
+
+const returnResult = (importObj, importArr, keyName) => {
+    if (importObj[keyName] && importObj[keyName].length > 0) {
+        return { ...importObj, [keyName]: [...importObj[keyName], importArr] };
+    } else {
+        return { ...importObj, [keyName]: importArr };
+    }
+};
+
 updatedTransactions = (arr, fkArr) => arr.map(transaction => {
     /* Finding products with correct foreign key, creating an array of objects with products */
     const filteredProducts = fkArr.filter(product => {
@@ -7,27 +16,7 @@ updatedTransactions = (arr, fkArr) => arr.map(transaction => {
         }
     });
 
-    /* Checking if products key exists, creating product array if it does not exist */
-    if (transaction.products && transaction.products.length > 0) {
-        return { ...transaction, products: [...transaction.products, filteredProducts] };
-    } else {
-        return { ...transaction, products: filteredProducts };
-    }
-});
-
-transactionsWithProducts = (arr, fkArr) => arr.map(transaction => {
-    /* Finding products with correct foreign key, creating an array of objects with products */
-    const filteredProducts = fkArr.filter(product => {
-        if (transaction.transaction_id === product.fk_transaction) {
-            return product;
-        }
-    });
-
-    if (transaction.products && transaction.products.length > 0) {
-        return { ...transaction, products: [...transaction.products, filteredProducts] };
-    } else {
-        return { ...transaction, products: filteredProducts };
-    }
+    return returnResult(transaction, filteredProducts, 'products');
 });
 
 data = (arr, fkArr) => arr.map(card => {
@@ -38,13 +27,8 @@ data = (arr, fkArr) => arr.map(card => {
         }
     });
 
-    if (card.transactions && card.transactions.length > 0) {
-        return { ...card, transactions: [...card.transactions, filteredTransactions] };
-    } else {
-        return { ...card, transactions: filteredTransactions };
-    }
+    return returnResult(card, filteredTransactions, 'transactions');
 });
 
 exports.updatedTransactions = updatedTransactions;
-exports.transactionsWithProducts = transactionsWithProducts;
 exports.data = data;

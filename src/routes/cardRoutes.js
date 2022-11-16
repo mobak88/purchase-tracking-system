@@ -5,7 +5,8 @@ const router = express.Router();
 
 router
     .route('/cards')
-    .get(cardController.getAllCards);
+    .get(cardController.getAllCards)
+    .post(cardController.postCard);
 
 router
     .route('/cards/:id')

@@ -7,18 +7,24 @@ const filteredItems = require('./filterItems');
   * chained objects
 */
 
+/* Reusable function to create uique arrays (set) */
+const filterItems = (arr, uniqueSet, keyName) => {
+    const filtered = arr.filter(item => {
+        if (!uniqueSet.has(item[keyName])) {
+            uniqueSet.add(item[keyName]);
+            return true;
+        }
+        return false;
+    });
+
+    return filtered;
+};
+
 exports.dataStructure = (allData) => {
     /* Return unique cards */
     const cardNumberSet = new Set();
 
-    const filteredCards = allData.filter(card => {
-        if (!cardNumberSet.has(card.card_number)) {
-            cardNumberSet.add(card.card_number);
-            return card;
-        } else {
-            return;
-        }
-    });
+    const filteredCards = filterItems(allData, cardNumberSet, 'card_number');
 
     /* Removing everything except card data */
     const cards = filteredCards.map(card => {
@@ -28,14 +34,7 @@ exports.dataStructure = (allData) => {
     /* Return unique transactions */
     const transactionSet = new Set();
 
-    const filteredTransactions = allData.filter(transaction => {
-        if (!transactionSet.has(transaction.transaction_id)) {
-            transactionSet.add(transaction.transaction_id);
-            return transaction;
-        } else {
-            return;
-        }
-    });
+    const filteredTransactions = filterItems(allData, transactionSet, 'transaction_id');
 
     /* Removing everything except transaction data */
     const transactions = filteredTransactions.map(transaction => {
@@ -51,14 +50,7 @@ exports.dataStructure = (allData) => {
     /* Return unique product */
     const productSet = new Set();
 
-    const filteredProducts = allData.filter(product => {
-        if (!productSet.has(product.product_id)) {
-            productSet.add(product.product_id);
-            return product;
-        } else {
-            return;
-        }
-    });
+    const filteredProducts = filterItems(allData, productSet, 'product_id');
 
     /* Removing everything except product data */
     const products = filteredProducts.map(product => {
@@ -71,7 +63,7 @@ exports.dataStructure = (allData) => {
         };
     });
 
-    const transactionsWithProducts = filteredItems.transactionsWithProducts(transactions, products);
+    const transactionsWithProducts = filteredItems.updatedTransactions(transactions, products);
 
     const data = filteredItems.data(cards, transactionsWithProducts);
 
