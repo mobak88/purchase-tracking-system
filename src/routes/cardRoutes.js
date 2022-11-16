@@ -10,6 +10,6 @@ router
 router
     .route('/cards/:id')
     .get(cardController.getCard)
-    .delete();
+    .delete(cardController.deleteCard);
 
 module.exports = router;
