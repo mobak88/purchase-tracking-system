@@ -16,6 +16,12 @@ Conect to PSQL
 Conect to a DATABASE
 `\c + DATABASE name`
 
+## Endpoints
+
+| Name | Request type | Endpoint                    | Body                 |
+| ---- | ------------ | --------------------------- | -------------------- |
+| item | POST         | http://localhost:8080/items | {\"name": "string"\} |
+
 ### `start`
 
 Start the server.
