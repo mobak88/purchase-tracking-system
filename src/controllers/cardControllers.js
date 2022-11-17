@@ -73,8 +73,6 @@ exports.deleteCard = ('/cards/:id', async (req, res) => {
 });
 
 // Post card
-let cardIsSubmitted = false;
-
 exports.postCard = ('/cards', async (req, res) => {
     const items = require('./itemControllers');
     const connection = await pool.connect();
@@ -82,45 +80,63 @@ exports.postCard = ('/cards', async (req, res) => {
     try {
         const { card_number, transaction_store, transaction_place } = req.body;
 
+        errorHandler.checkIdIsNumber(card_number, res);
+
         const date = new Date;
 
         const year = date.getFullYear().toString().slice(-2);
 
         const dateString = `${date.getDate()}.${date.getMonth() + 1}.${year}`;
 
-        const newCard = await pool.query(
-            'INSERT INTO creditcard (card_number) VALUES($1) RETURNING *',
-            [card_number]
+        const card = await pool.query(
+            'SELECT * FROM creditcard WHERE card_number = $1', [card_number]
         );
 
-        const newTransaction = await pool.query(
-            'INSERT INTO transaction (fk_card, transaction_store, transaction_place, date_string) VALUES($1, $2, $3, $4) RETURNING *',
-            [newCard.rows[0].card_id, transaction_store, transaction_place, dateString]
-        );
+        // Function that is used in both if and else to avoid repeating code 
+        const insertProducts = async (newTransaction) => {
+            await connection.query('BEGIN');
 
-        const newItemsArr = items.itemsArr.map(item => {
-            return { ...item, fk_transaction: newTransaction.rows[0].transaction_id };
-        });
+            const newItemsArr = items.itemsArr.map(item => {
+                return { ...item, fk_transaction: newTransaction.rows[0].transaction_id };
+            });
 
-        await connection.query('BEGIN');
+            // I cheated here using a for loop found solution here: https://github.com/brianc/node-postgres/issues/2658 
+            for (let i = 0; i < newItemsArr.length; i++) {
+                await pool.query(
+                    'INSERT INTO product (product_name, category, price, fk_transaction) VALUES($1, $2, $3, $4) RETURNING *',
+                    [newItemsArr[i].name, newItemsArr[i]?.name, newItemsArr[i].price, newItemsArr[i].fk_transaction]
+                );
+            }
+        };
 
-        /* I cheated here using a for loop found solution here: https://github.com/brianc/node-postgres/issues/2658  */
-        /* Should cehck if card exist and add transaction and products to card if exists, but I dont have time to do it */
-        for (let i = 0; i < newItemsArr.length; i++) {
-            await pool.query(
-                'INSERT INTO product (product_name, category, price, fk_transaction) VALUES($1, $2, $3, $4) RETURNING *',
-                [newItemsArr[i].name, newItemsArr[i]?.name, newItemsArr[i].price, newItemsArr[i].fk_transaction]
+        // Check if card exists, push products and transaction to card if exists, create new card with products and transactions if not
+        if (card.rows.length < 1) {
+            const newCard = await pool.query(
+                'INSERT INTO creditcard (card_number) VALUES($1) RETURNING *',
+                [card_number]
             );
+
+            const newTransaction = await pool.query(
+                'INSERT INTO transaction (fk_card, transaction_store, transaction_place, date_string) VALUES($1, $2, $3, $4) RETURNING *',
+                [newCard.rows[0].card_id, transaction_store, transaction_place, dateString]
+            );
+
+            insertProducts(newTransaction);
+        } else {
+            const newTransaction = await pool.query(
+                'INSERT INTO transaction (fk_card, transaction_store, transaction_place, date_string) VALUES($1, $2, $3, $4) RETURNING *',
+                [card.rows[0].card_id, transaction_store, transaction_place, dateString]
+            );
+
+            insertProducts(newTransaction);
         }
 
         await connection.query('COMMIT');
 
-        res.json(newItemsArr);
+        res.json(card.rows);
 
         cardIsSubmitted = false;
     } catch (err) {
         console.error(err.message);
     }
 });
-
-exports.cardIsSubmitted = cardIsSubmitted;
