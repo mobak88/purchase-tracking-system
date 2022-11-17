@@ -14,4 +14,9 @@ exports.postItem = ('/items', async (req, res) => {
     }
 });
 
+// Clear array function
+exports.clearItemsArr = (() => {
+    itemsArr.length = 0;
+});
+
 exports.itemsArr = itemsArr;

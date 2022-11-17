@@ -143,9 +143,9 @@ exports.postCard = ('/cards', async (req, res) => {
 
         await connection.query('COMMIT');
 
-        res.json(card.rows);
+        items.clearItemsArr();
 
-        cardIsSubmitted = false;
+        res.json(card.rows);
     } catch (err) {
         console.error(err.message);
     }
