@@ -20,7 +20,7 @@ Conect to a DATABASE
 
 | Name | Request type | Endpoint                    | Body                 |
 | ---- | ------------ | --------------------------- | -------------------- |
-| item | POST         | http://localhost:8080/items | {\"name": "string"\} |
+| item | POST         | http://localhost:8080/items | { "name": "string" } |
 
 ### `start`
 
