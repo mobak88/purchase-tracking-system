@@ -29,7 +29,7 @@ Open your terminal
 | Get month-year | GET          | http://localhost:8080/days/{month}/{year} |                                                                                                                 |
 | Delete card    | DELETE       | http://localhost:8080/cards/{id}          |                                                                                                                 |
 
-### `start`
+## `start`
 
 Start the server.
 
@@ -38,3 +38,8 @@ npm run start
 # or
 yarn start
 ```
+
+## External packages
+
+- Cors: CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options. [Read more about cors](https://www.npmjs.com/package/cors)
+- dotenv: Loads environment variables from a .env file into process.env. [Read more about dotenv](https://www.npmjs.com/package/cors)
