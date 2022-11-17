@@ -1,8 +1,8 @@
 /* Functions that checks if req.params is number and exists, needs res to send error msg */
 exports.checkIdIsNumber = (id, res) => {
     if (isNaN(parseInt(id))) {
-        // Not sure if 405 is the correct status code
-        return res.status(405).json('Please use number');
+        // Was not sure wich status code to use, whent with the accepted answer here: https://stackoverflow.com/questions/7939137/what-http-status-code-should-be-used-for-wrong-input
+        return res.status(422).json('Please use number');
     }
 };
 
