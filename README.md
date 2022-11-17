@@ -25,6 +25,7 @@ Conect to a DATABASE
 | Get card       | GET          | http://localhost:8080/cards/{id}          |                                                                                                                 |
 | Get date       | GET          | http://localhost:8080/days/{date}         |                                                                                                                 |
 | Get month-year | GET          | http://localhost:8080/days/{month}/{year} |                                                                                                                 |
+| Delete card    | DELETE       | http://localhost:8080/cards/{id}          |                                                                                                                 |
 
 ### `start`
 
