@@ -41,5 +41,7 @@ yarn start
 
 ## External packages
 
+- express: Framework for Node.js. [Read more about express](https://www.npmjs.com/package/express)
 - Cors: CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options. [Read more about cors](https://www.npmjs.com/package/cors)
-- dotenv: Loads environment variables from a .env file into process.env. [Read more about dotenv](https://www.npmjs.com/package/cors)
+- dotenv: Loads environment variables from a .env file into process.env. [Read more about dotenv](https://www.npmjs.com/package/dotenv)
+- pg: PostgreSQL client for Node.js. [Read more about pg](https://github.com/brianc/node-postgres)
