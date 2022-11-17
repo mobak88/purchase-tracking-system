@@ -82,6 +82,16 @@ exports.postCard = ('/cards', async (req, res) => {
 
         errorHandler.checkIdIsNumber(card_number, res);
 
+        console.log(card_number.toString().length, card_number);
+
+        if (card_number.toString().length !== 4) {
+            return res.status(405).json('Card number must be four digits');
+        }
+
+        if (items.itemsArr.length < 1) {
+            return res.status(405).json('No items to register');
+        }
+
         const date = new Date;
 
         const year = date.getFullYear().toString().slice(-2);
