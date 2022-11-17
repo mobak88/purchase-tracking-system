@@ -6,6 +6,7 @@ const pool = require('./db');
 const cardRouter = require('./routes/cardRoutes');
 const dayRouter = require('./routes/dayRoutes');
 const monthYearRouter = require('./routes/monthYearRoutes');
+const itemRouter = require('./routes/itemRoutes');
 
 const url = process.env.URL || 'localhost';
 const port = process.env.PORT || 8080;
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use('/', cardRouter);
 app.use('/', dayRouter);
 app.use('/', monthYearRouter);
+app.use('/', itemRouter);
 
 //Get all transactions
 app.get('/transactions', async (req, res) => {

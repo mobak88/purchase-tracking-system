@@ -1,6 +1,7 @@
 /* HTTP requests exported for cards */
 const pool = require('../db');
-const filteredItems = require('./../filterItems');
+const filteredItems = require('../utils/filterItems');
+const errorHandler = require('./../utils/errorHandler');
 
 //Get all cards
 exports.getAllCards = ('/cards', async (req, res) => {
@@ -17,7 +18,13 @@ exports.getAllCards = ('/cards', async (req, res) => {
 exports.getCard = ('/cards/:id', async (req, res) => {
     try {
         const { id } = req.params;
+
+        errorHandler.checkIdIsNumber(id, res);
+
         const card = await pool.query('SELECT * FROM creditcard WHERE card_id = $1', [id]);
+
+        errorHandler.checkIdExists(card, res);
+
         const transactions = await pool.query('SELECT * FROM transaction WHERE fk_card = $1', [id]);
         const products = await pool.query('SELECT * FROM product');
 
@@ -43,13 +50,19 @@ exports.deleteCard = ('/cards/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
+        errorHandler.checkIdIsNumber(id, res);
+
         const transactions = await pool.query('SELECT * FROM transaction WHERE fk_card = $1', [id]);
+
+        errorHandler.checkIdExists(transactions, res);
+
         const products = await pool.query('SELECT * FROM product');
 
         const productsIdArr = products.rows.filter(product => transactions.rows.find(transaction => product.fk_transaction === transaction.transaction_id)).map(product => product.product_id);
 
-        // I got help with this one, could probably never manage to solve it my self
+        // I got help with this query, could probably never manage to solve it my self
         await pool.query(`DELETE FROM product WHERE product_id IN (${productsIdArr.map((val, i) => `$${i + 1}`).join(', ')})`, [...productsIdArr]);
+
         await pool.query('DELETE FROM transaction WHERE fk_card = $1', [id]);
         await pool.query('DELETE FROM creditcard WHERE card_id = $1', [id]);
 
@@ -60,6 +73,54 @@ exports.deleteCard = ('/cards/:id', async (req, res) => {
 });
 
 // Post card
+let cardIsSubmitted = false;
+
 exports.postCard = ('/cards', async (req, res) => {
-    const { card_number } = req.body;
+    const items = require('./itemControllers');
+    const connection = await pool.connect();
+
+    try {
+        const { card_number, transaction_store, transaction_place } = req.body;
+
+        const date = new Date;
+
+        const year = date.getFullYear().toString().slice(-2);
+
+        const dateString = `${date.getDate()}.${date.getMonth() + 1}.${year}`;
+
+        const newCard = await pool.query(
+            'INSERT INTO creditcard (card_number) VALUES($1) RETURNING *',
+            [card_number]
+        );
+
+        const newTransaction = await pool.query(
+            'INSERT INTO transaction (fk_card, transaction_store, transaction_place, date_string) VALUES($1, $2, $3, $4) RETURNING *',
+            [newCard.rows[0].card_id, transaction_store, transaction_place, dateString]
+        );
+
+        const newItemsArr = items.itemsArr.map(item => {
+            return { ...item, fk_transaction: newTransaction.rows[0].transaction_id };
+        });
+
+        await connection.query('BEGIN');
+
+        /* I cheated here using a for loop found solution here: https://github.com/brianc/node-postgres/issues/2658  */
+        /* Should cehck if card exist and add transaction and products to card if exists, but I dont have time to do it */
+        for (let i = 0; i < newItemsArr.length; i++) {
+            await pool.query(
+                'INSERT INTO product (product_name, category, price, fk_transaction) VALUES($1, $2, $3, $4) RETURNING *',
+                [newItemsArr[i].name, newItemsArr[i]?.name, newItemsArr[i].price, newItemsArr[i].fk_transaction]
+            );
+        }
+
+        await connection.query('COMMIT');
+
+        res.json(newItemsArr);
+
+        cardIsSubmitted = false;
+    } catch (err) {
+        console.error(err.message);
+    }
 });
+
+exports.cardIsSubmitted = cardIsSubmitted;

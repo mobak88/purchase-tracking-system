@@ -1,14 +1,24 @@
 /* HTTP requests exported for items */
 const pool = require('../db');
+const clearArr = require('./cardControllers');
 
-export const itemsArr = [];
+/* Creating array */
+const itemsArr = [];
 
-exports.postItem = ('/item', async (req, res) => {
+// Post item saved to array and exported
+exports.postItem = ('/items', async (req, res) => {
     try {
-        const { name, category, price } = req.body;
+        itemsArr.push(req.body);
 
-        res.json(req.body);
+        if (clearArr.cardIsSubmitted === true) {
+            console.log(true);
+            itemsArr.length = 0;
+        }
+
+        res.json(itemsArr);
     } catch (err) {
         console.error(err.message);
     }
 });
+
+exports.itemsArr = itemsArr;

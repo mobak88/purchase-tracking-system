@@ -7,7 +7,7 @@ const filteredItems = require('./filterItems');
   * chained objects
 */
 
-/* Reusable function to create uique arrays (set) */
+/* Reusable function to create unique arrays (set) */
 const filterItems = (arr, uniqueSet, keyName) => {
     const filtered = arr.filter(item => {
         if (!uniqueSet.has(item[keyName])) {

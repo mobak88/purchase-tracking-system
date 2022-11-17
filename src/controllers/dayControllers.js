@@ -1,6 +1,6 @@
 /* HTTP requests exported for day */
 const pool = require('../db');
-const { dataStructure } = require('./../dataStructure');
+const { dataStructure } = require('../utils/dataStructure');
 
 // Get products registered on a given date
 exports.getDay = ('/days/:date', async (req, res) => {
