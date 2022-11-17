@@ -1,3 +1,4 @@
+/* Routes for item */
 const express = require('express');
 const itemController = require('./../controllers/itemControllers');
 const router = express.Router();

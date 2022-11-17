@@ -3,7 +3,7 @@
 /* Creating array */
 const itemsArr = [];
 
-// Post item saved to array and exported
+// Push items to array
 exports.postItem = ('/items', async (req, res) => {
     try {
         itemsArr.push(req.body);
