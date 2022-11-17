@@ -3,7 +3,7 @@
 API for purchase tracking system
 
 You need psql installed on your machine to run the database and change the password in db.js to your password.{<br />
-Download PostgreSQL [Here](https://www.postgresql.org/download/){<br />
+Download PostgreSQL [Here](https://www.postgresql.org/download/)<br />
 The recipe for creating database and tables can be found in [Here](https://github.com/mobak88/purchase-tracking-system/blob/main/database.sql)
 
 ## Connect to database
