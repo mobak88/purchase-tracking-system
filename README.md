@@ -18,9 +18,10 @@ Conect to a DATABASE
 
 ## Endpoints
 
-| Name | Request type | Endpoint                    | Body                                                                                |
-| ---- | ------------ | --------------------------- | ----------------------------------------------------------------------------------- |
-| item | POST         | http://localhost:8080/items | {<br /> "name": "string",<br />"category": "string",<br />"price": "string",<br />} |
+| Name     | Request type | Endpoint                    | Body                                                                                                            |
+| -------- | ------------ | --------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Add item | POST         | http://localhost:8080/items | {<br /> "name": "string",<br />"category": "string",<br />"price": "number",<br />}                             |
+| Add card | POST         | http://localhost:8080/cards | {<br /> "card_number": "number",<br />"transaction_store": "string",<br />"transaction_place": "string",<br />} |
 
 ### `start`
 
