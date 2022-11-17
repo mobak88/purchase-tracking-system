@@ -10,10 +10,12 @@ The recipe for creating database and tables can be found in [Here](https://githu
 
 Open your terminal
 
-###Conect to PSQL
+### Conect to PSQL
+
 `psql -U postgres`
 
-###Conect to a DATABASE
+### Conect to a DATABASE
+
 `\c + DATABASE name`
 
 ## Endpoints
