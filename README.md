@@ -18,9 +18,9 @@ Conect to a DATABASE
 
 ## Endpoints
 
-| Name | Request type | Endpoint                    | Body                        |
-| ---- | ------------ | --------------------------- | --------------------------- |
-| item | POST         | http://localhost:8080/items | { return "name": "string" } |
+| Name | Request type | Endpoint                    | Body                             |
+| ---- | ------------ | --------------------------- | -------------------------------- |
+| item | POST         | http://localhost:8080/items | {<br /> "name": "string",<br />} |
 
 ### `start`
 
