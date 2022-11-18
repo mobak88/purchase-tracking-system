@@ -82,8 +82,6 @@ exports.postCard = ('/cards', async (req, res) => {
 
         errorHandler.checkIdIsNumber(card_number, res);
 
-        console.log(card_number.toString().length, card_number);
-
         if (card_number.toString().length !== 4) {
             return res.status(422).json('Card number must be four digits');
         }
