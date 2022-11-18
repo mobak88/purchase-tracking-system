@@ -6,6 +6,7 @@ exports.checkIdIsNumber = (id, res) => {
     }
 };
 
+/* Checks if query.rows returns anything, if not send error msg */
 exports.checkIdExists = (item, res) => {
     // If not match id does not exist
     if (item.rows.length === 0) {

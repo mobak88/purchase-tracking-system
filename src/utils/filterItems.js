@@ -1,5 +1,6 @@
 /* Moving filter functions here to not clutter HTTP requests */
 
+/* Generic function that returns object with keyname added to avoid code repetition, takes an object, array and spesified keyname as paramaters */
 const returnResult = (importObj, importArr, keyName) => {
     if (importObj[keyName] && importObj[keyName].length > 0) {
         return { ...importObj, [keyName]: [...importObj[keyName], importArr] };
@@ -8,6 +9,7 @@ const returnResult = (importObj, importArr, keyName) => {
     }
 };
 
+/* Function maps array filters foreign key === id, takes array and foreign key as parameters, passes parameters to and returns returnResult */
 updatedTransactions = (arr, fkArr) => arr.map(transaction => {
     /* Finding products with correct foreign key, creating an array of objects with products */
     const filteredProducts = fkArr.filter(product => {
@@ -19,6 +21,7 @@ updatedTransactions = (arr, fkArr) => arr.map(transaction => {
     return returnResult(transaction, filteredProducts, 'products');
 });
 
+/* Does the same as updatedTransactions could have used brackets to take card_id and  fk_card as parameters but it would become very difficult to read */
 data = (arr, fkArr) => arr.map(card => {
     /* Finding transactions with correct foreign key, creating an array of objects with transactions */
     const filteredTransactions = fkArr.filter(transaction => {

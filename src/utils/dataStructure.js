@@ -7,7 +7,7 @@ const filteredItems = require('./filterItems');
   * chained objects
 */
 
-/* Reusable function to create arrays with unique values (set) */
+/* Reusable function to create arrays with unique values (set), takes array, set and keyname as parameters, returns the set of unique values */
 const filterItems = (arr, uniqueSet, keyName) => {
     const filtered = arr.filter(item => {
         if (!uniqueSet.has(item[keyName])) {
@@ -20,6 +20,7 @@ const filterItems = (arr, uniqueSet, keyName) => {
     return filtered;
 };
 
+/* Creates data structure, takes query as a parameter, returns the data structure */
 exports.dataStructure = (allData) => {
     /* Return unique cards */
     const cardNumberSet = new Set();
