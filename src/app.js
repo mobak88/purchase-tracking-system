@@ -1,3 +1,4 @@
+/* This is the main entry point of the application */
 const express = require('express');
 const app = express();
 const cors = require('cors');
